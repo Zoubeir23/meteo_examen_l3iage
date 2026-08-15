@@ -32,9 +32,19 @@ class WeatherDataTable extends StatelessWidget {
                 (city) => DataRow(
                   onSelectChanged: (_) => onCityTap(city),
                   cells: [
-                    DataCell(Text(city.cityName, style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ))),
+                    DataCell(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            city.cityName,
+                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 8),
+                          _CountryBadge(countryCode: city.countryCode),
+                        ],
+                      ),
+                    ),
                     DataCell(
                       Image.network(
                         city.iconUrl,
@@ -58,6 +68,34 @@ class WeatherDataTable extends StatelessWidget {
                 ),
               )
               .toList(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small pill showing a city's country code, using the brand's gold accent
+/// as a secondary highlight next to the (pink-accented) primary data.
+class _CountryBadge extends StatelessWidget {
+  const _CountryBadge({required this.countryCode});
+
+  final String countryCode;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.tertiary.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        countryCode,
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: theme.colorScheme.tertiary,
         ),
       ),
     );
