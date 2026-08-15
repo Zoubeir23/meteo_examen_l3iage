@@ -31,7 +31,7 @@ class CityDetailScreen extends StatelessWidget {
                       weather.iconUrl,
                       width: 72,
                       height: 72,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.cloud_outlined, size: 56),
+                      errorBuilder: (_, _, _) => const Icon(Icons.cloud_outlined, size: 56),
                     ),
                     const SizedBox(width: 16),
                     Expanded(

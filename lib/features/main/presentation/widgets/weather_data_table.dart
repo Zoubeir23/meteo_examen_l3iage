@@ -40,7 +40,7 @@ class WeatherDataTable extends StatelessWidget {
                         city.iconUrl,
                         width: 32,
                         height: 32,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.cloud_outlined, size: 24),
+                        errorBuilder: (_, _, _) => const Icon(Icons.cloud_outlined, size: 24),
                       ),
                     ),
                     DataCell(Text('${city.temperature.round()}°C')),

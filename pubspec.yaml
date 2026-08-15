@@ -66,7 +66,7 @@ dev_dependencies:
 
   # Code generation (Retrofit client + JSON models)
   build_runner: ^2.4.13
-  retrofit_generator: ^9.1.5
+  retrofit_generator: ^10.2.8
   json_serializable: ^6.9.0
 
 # For information on the generic Dart part of this file, see the
