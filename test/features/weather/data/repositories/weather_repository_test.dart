@@ -133,4 +133,28 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single, isA<WeatherFetchSuccess>());
   });
+
+  test('watchAllCitiesWeather rejects a pollCount below 1', () async {
+    final fakeApi = FakeWeatherApiService(
+      (cityQuery) async => OpenWeatherResponse.fromJson(buildOpenWeatherJson(cityQuery)),
+    );
+    final repository = WeatherRepository(apiService: fakeApi, apiKey: 'test-key');
+
+    await expectLater(
+      repository.watchAllCitiesWeather(pollCount: 0).toList(),
+      throwsArgumentError,
+    );
+  });
+
+  test('watchAllCitiesWeather rejects a negative interval', () async {
+    final fakeApi = FakeWeatherApiService(
+      (cityQuery) async => OpenWeatherResponse.fromJson(buildOpenWeatherJson(cityQuery)),
+    );
+    final repository = WeatherRepository(apiService: fakeApi, apiKey: 'test-key');
+
+    await expectLater(
+      repository.watchAllCitiesWeather(interval: const Duration(seconds: -1)).toList(),
+      throwsArgumentError,
+    );
+  });
 }

@@ -25,6 +25,12 @@ class WeatherRepository {
     int pollCount = ApiConstants.pollCount,
     Duration interval = ApiConstants.pollingInterval,
   }) async* {
+    if (pollCount < 1) {
+      throw ArgumentError.value(pollCount, 'pollCount', 'must be at least 1');
+    }
+    if (interval.isNegative) {
+      throw ArgumentError.value(interval, 'interval', 'must not be negative');
+    }
     for (var i = 0; i < pollCount; i++) {
       final result = await fetchAllCitiesWeather();
       yield result;
