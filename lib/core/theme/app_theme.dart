@@ -10,9 +10,16 @@ class AppTheme {
 
   static ThemeData get light => _themeFrom(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.skyBlue,
-          brightness: Brightness.light,
+        colorScheme: ColorScheme.light(
+          primary: AppColors.brandPink,
+          onPrimary: AppColors.pureWhite,
+          secondary: AppColors.brandBlue,
+          onSecondary: AppColors.pureWhite,
+          tertiary: AppColors.brandGold,
+          onTertiary: AppColors.pureBlack,
+          surface: AppColors.lightSurface,
+          onSurface: AppColors.pureBlack,
+          error: AppColors.error,
         ),
         background: AppColors.lightBackground,
         surface: AppColors.lightSurface,
@@ -20,9 +27,16 @@ class AppTheme {
 
   static ThemeData get dark => _themeFrom(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.skyBlueDark,
-          brightness: Brightness.dark,
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.brandPink,
+          onPrimary: AppColors.pureWhite,
+          secondary: AppColors.brandBlue,
+          onSecondary: AppColors.pureWhite,
+          tertiary: AppColors.brandGold,
+          onTertiary: AppColors.pureBlack,
+          surface: AppColors.darkSurface,
+          onSurface: AppColors.pureWhite,
+          error: AppColors.error,
         ),
         background: AppColors.darkBackground,
         surface: AppColors.darkSurface,
@@ -76,6 +90,9 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          disabledBackgroundColor: colorScheme.primary.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
           textStyle: textTheme.titleMedium,
