@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/env_config.dart';
 import '../../../../core/widgets/api_error_view.dart';
@@ -15,17 +16,17 @@ import '../widgets/weather_progress_gauge.dart';
 
 enum _LoadState { loading, success, error }
 
-/// Main screen: fills the progress gauge while the 5 cities' weather is
-/// fetched, then reveals the results table.
+/// Main screen: fills the progress gauge in step with the real, repeated
+/// OpenWeather polling ([WeatherRepository.watchAllCitiesWeather]), then
+/// reveals the results table.
 ///
-/// NOTE for the navigation/gauge owner: the gauge fill here is a simple
-/// linear simulation (`_MainScreenState._startLoading`) driven by a
-/// [Timer.periodic], and the loading messages are a static rotating list.
-/// Replace both with the AnimationController-driven gauge synced to the
-/// real polling cadence ([ApiConstants.pollingInterval]) — the visual gauge
-/// widget ([WeatherProgressGauge]) and the data layer ([WeatherRepository])
-/// are already decoupled from this wiring so that swap should be local to
-/// this file.
+/// NOTE for the navigation/gauge owner: the gauge fill here is driven
+/// directly by poll progress (`pollIndex / ApiConstants.pollCount`) rather
+/// than a dedicated [AnimationController], and the loading messages rotate
+/// one per poll. Swap in a smoother `AnimationController`-driven
+/// interpolation between polls if desired — [WeatherProgressGauge] and
+/// [WeatherRepository] are already decoupled from this wiring, so that
+/// change should stay local to this file.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -51,8 +52,7 @@ class _MainScreenState extends State<MainScreen> {
   List<WeatherModel> _cities = const [];
   String _errorMessage = '';
 
-  Timer? _progressTimer;
-  Timer? _messageTimer;
+  StreamSubscription<WeatherFetchResult>? _pollSubscription;
 
   @override
   void initState() {
@@ -62,14 +62,12 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
-    _progressTimer?.cancel();
-    _messageTimer?.cancel();
+    _pollSubscription?.cancel();
     super.dispose();
   }
 
   void _startLoading() {
-    _progressTimer?.cancel();
-    _messageTimer?.cancel();
+    _pollSubscription?.cancel();
 
     setState(() {
       _state = _LoadState.loading;
@@ -77,38 +75,34 @@ class _MainScreenState extends State<MainScreen> {
       _messageIndex = 0;
     });
 
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
-      if (!mounted) return;
-      setState(() => _progress = (_progress + 0.05).clamp(0.0, 0.92));
-    });
+    var pollIndex = 0;
+    _pollSubscription = _repository.watchAllCitiesWeather().listen(
+      (result) {
+        if (!mounted) return;
+        pollIndex++;
 
-    _messageTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (!mounted) return;
-      setState(() => _messageIndex = (_messageIndex + 1) % _loadingMessages.length);
-    });
-
-    _fetchWeather();
-  }
-
-  Future<void> _fetchWeather() async {
-    final result = await _repository.fetchAllCitiesWeather();
-    _progressTimer?.cancel();
-    _messageTimer?.cancel();
-    if (!mounted) return;
-
-    switch (result) {
-      case WeatherFetchSuccess(:final cities):
+        switch (result) {
+          case WeatherFetchSuccess(:final cities):
+            setState(() {
+              _cities = cities;
+              _progress = pollIndex / ApiConstants.pollCount;
+              _messageIndex = (pollIndex - 1) % _loadingMessages.length;
+            });
+          case WeatherFetchFailure(:final message):
+            setState(() {
+              _errorMessage = message;
+              _state = _LoadState.error;
+            });
+        }
+      },
+      onDone: () {
+        if (!mounted || _state == _LoadState.error) return;
         setState(() {
           _progress = 1;
-          _cities = cities;
           _state = _LoadState.success;
         });
-      case WeatherFetchFailure(:final message):
-        setState(() {
-          _errorMessage = message;
-          _state = _LoadState.error;
-        });
-    }
+      },
+    );
   }
 
   void _openCityDetail(WeatherModel city) {
