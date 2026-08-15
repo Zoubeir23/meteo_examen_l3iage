@@ -43,7 +43,15 @@ class WeatherDataTable extends StatelessWidget {
                         errorBuilder: (_, _, _) => const Icon(Icons.cloud_outlined, size: 24),
                       ),
                     ),
-                    DataCell(Text('${city.temperature.round()}°C')),
+                    DataCell(
+                      Text(
+                        '${city.temperature.round()}°C',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
                     DataCell(Text(city.description)),
                     DataCell(Text('${city.humidity}%')),
                   ],
