@@ -75,4 +75,9 @@ flutter run
 ```bash
 flutter analyze
 flutter test
+flutter test --coverage   # génère coverage/lcov.info (≈84% sur le service API + design)
 ```
+
+Couverture par unit tests (modèles, repository, polling), widget tests (tableau,
+jauge, écrans d'accueil/détail/erreur) et un test d'intégration de bout en bout
+sur `MainScreen` (chargement → tableau → détail, et cas d'erreur + retry).
