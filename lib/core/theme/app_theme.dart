@@ -34,10 +34,25 @@ class AppTheme {
     required Color background,
     required Color surface,
   }) {
-    final textTheme = GoogleFonts.poppinsTextTheme(
+    final baseTextTheme = GoogleFonts.libreFranklinTextTheme(
       brightness == Brightness.dark
           ? ThemeData(brightness: Brightness.dark).textTheme
           : ThemeData(brightness: Brightness.light).textTheme,
+    );
+
+    // Bold, oversized headline scale — the "big confident type" signature
+    // borrowed from the reference site's hero sections.
+    final textTheme = baseTextTheme.copyWith(
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
     );
 
     return ThemeData(
@@ -51,19 +66,27 @@ class AppTheme {
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+        titleTextStyle: textTheme.titleLarge,
       ),
       cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          textStyle: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          textStyle: textTheme.titleMedium,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          side: BorderSide(color: colorScheme.primary, width: 1.5),
+          textStyle: textTheme.titleMedium,
         ),
       ),
       dataTableTheme: DataTableThemeData(
@@ -72,7 +95,7 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }

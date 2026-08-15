@@ -33,11 +33,19 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.wb_sunny_rounded, size: 96, color: theme.colorScheme.primary),
-                const SizedBox(height: 24),
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.wb_sunny_rounded, size: 76, color: theme.colorScheme.primary),
+                ),
+                const SizedBox(height: 32),
                 Text(
                   'Bienvenue !',
-                  style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.headlineLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),

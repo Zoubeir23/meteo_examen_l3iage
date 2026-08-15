@@ -48,3 +48,6 @@ app.*.map.json
 .env
 android/local.properties
 ios/Runner/GoogleService-Info.plist
+
+# Local browser-automation artifacts
+.playwright-mcp/
