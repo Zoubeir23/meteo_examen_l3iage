@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meteo_examen_l3iage/core/constants/api_constants.dart';
 import 'package:meteo_examen_l3iage/features/detail/presentation/screens/city_detail_screen.dart';
 import 'package:meteo_examen_l3iage/features/main/presentation/screens/main_screen.dart';
 import 'package:meteo_examen_l3iage/features/weather/data/models/open_weather_response.dart';
@@ -9,11 +10,12 @@ import 'package:meteo_examen_l3iage/features/weather/data/repositories/weather_r
 import '../../../weather/data/support/fake_weather_api_service.dart';
 
 /// Advances through one full [WeatherRepository.watchAllCitiesWeather] poll
-/// cycle (default: 3 polls, 5s apart) inside the fake-async test clock.
+/// cycle (default: [ApiConstants.pollCount] polls, [ApiConstants.pollingInterval]
+/// apart) inside the fake-async test clock.
 Future<void> _settlePolling(WidgetTester tester) async {
   await tester.pump();
-  for (var i = 0; i < 2; i++) {
-    await tester.pump(const Duration(seconds: 5));
+  for (var i = 0; i < ApiConstants.pollCount - 1; i++) {
+    await tester.pump(ApiConstants.pollingInterval);
     await tester.pump();
   }
 }
