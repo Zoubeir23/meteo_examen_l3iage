@@ -119,4 +119,18 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single, isA<WeatherFetchFailure>());
   });
+
+  test('watchAllCitiesWeather with pollCount 1 emits a single result and no delay', () async {
+    final fakeApi = FakeWeatherApiService(
+      (cityQuery) async => OpenWeatherResponse.fromJson(buildOpenWeatherJson(cityQuery)),
+    );
+    final repository = WeatherRepository(apiService: fakeApi, apiKey: 'test-key');
+
+    final results = await repository
+        .watchAllCitiesWeather(pollCount: 1, interval: const Duration(days: 1))
+        .toList();
+
+    expect(results, hasLength(1));
+    expect(results.single, isA<WeatherFetchSuccess>());
+  });
 }
