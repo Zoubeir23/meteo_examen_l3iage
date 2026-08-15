@@ -1,5 +1,5 @@
 name: meteo_examen_l3iage
-description: "A new Flutter project."
+description: "Météo temps réel, jauge animée et carte interactive — Examen Développement Mobile L3IAGE ISI 2026."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
