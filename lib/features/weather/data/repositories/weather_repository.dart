@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/constants/app_cities.dart';
 import '../datasources/weather_api_service.dart';
 import 'weather_fetch_result.dart';
@@ -15,8 +16,27 @@ class WeatherRepository {
   final WeatherApiService _apiService;
   final String _apiKey;
 
-  /// Fetches all 5 cities in parallel. Call this on a repeating timer to
-  /// satisfy the "poll every few seconds" requirement while the gauge fills.
+  /// Polls all 5 cities' weather [pollCount] times, [interval] apart,
+  /// satisfying the "appels API répétés toutes les quelques secondes"
+  /// requirement. Emits one [WeatherFetchResult] per poll so the caller
+  /// (gauge/progress UI) can advance in step with real network activity;
+  /// stops early — without further emissions — on the first failure.
+  Stream<WeatherFetchResult> watchAllCitiesWeather({
+    int pollCount = ApiConstants.pollCount,
+    Duration interval = ApiConstants.pollingInterval,
+  }) async* {
+    for (var i = 0; i < pollCount; i++) {
+      final result = await fetchAllCitiesWeather();
+      yield result;
+      if (result is WeatherFetchFailure) return;
+      if (i < pollCount - 1) {
+        await Future.delayed(interval);
+      }
+    }
+  }
+
+  /// Fetches all 5 cities in parallel once. Prefer [watchAllCitiesWeather]
+  /// to satisfy the "poll every few seconds" requirement.
   Future<WeatherFetchResult> fetchAllCitiesWeather() async {
     try {
       final responses = await Future.wait(
