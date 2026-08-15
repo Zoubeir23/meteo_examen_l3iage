@@ -37,6 +37,21 @@ void main() {
     expect((result as WeatherFetchFailure).message, contains('Clé API'));
   });
 
+  test('fetchAllCitiesWeather returns a network-error message on connection timeout', () async {
+    final fakeApi = FakeWeatherApiService(
+      (cityQuery) async => throw DioException(
+        requestOptions: RequestOptions(path: '/weather'),
+        type: DioExceptionType.connectionTimeout,
+      ),
+    );
+    final repository = WeatherRepository(apiService: fakeApi, apiKey: 'test-key');
+
+    final result = await repository.fetchAllCitiesWeather();
+
+    expect(result, isA<WeatherFetchFailure>());
+    expect((result as WeatherFetchFailure).message, contains('expiré'));
+  });
+
   test('watchAllCitiesWeather emits pollCount results on repeated success', () async {
     final fakeApi = FakeWeatherApiService(
       (cityQuery) async => OpenWeatherResponse.fromJson(buildOpenWeatherJson(cityQuery)),
