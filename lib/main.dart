@@ -5,6 +5,9 @@ import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  // isOptional: true — a missing .env shouldn't crash the app on launch;
+  // EnvConfig.openWeatherApiKey falls back to '' and the existing "clé API
+  // invalide ou manquante" error screen already handles that gracefully.
+  await dotenv.load(fileName: '.env', isOptional: true);
   runApp(const WeatherExamApp());
 }
