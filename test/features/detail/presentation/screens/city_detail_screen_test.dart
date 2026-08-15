@@ -28,5 +28,6 @@ void main() {
     expect(find.text('60%'), findsOneWidget);
     expect(find.text('3.4 m/s'), findsOneWidget);
     expect(find.text('Localisation'), findsOneWidget);
+    expect(find.text('SN'), findsOneWidget);
   });
 }

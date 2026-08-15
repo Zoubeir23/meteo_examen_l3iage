@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/widgets/country_badge.dart';
 import '../../../weather/data/models/weather_model.dart';
 import '../widgets/city_location_map.dart';
 
@@ -38,9 +39,17 @@ class CityDetailScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${weather.temperature.round()}°C',
-                            style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              Text(
+                                '${weather.temperature.round()}°C',
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              CountryBadge(countryCode: weather.countryCode),
+                            ],
                           ),
                           Text(
                             weather.description,
