@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/widgets/country_badge.dart';
 import '../../../weather/data/models/weather_model.dart';
 import '../widgets/city_location_map.dart';
 
@@ -38,9 +39,19 @@ class CityDetailScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${weather.temperature.round()}°C',
-                            style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 10,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                '${weather.temperature.round()}°C',
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              CountryBadge(countryCode: weather.countryCode),
+                            ],
                           ),
                           Text(
                             weather.description,
@@ -104,8 +115,23 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/country_badge.dart';
 import '../../../weather/data/models/weather_model.dart';
 
 /// Interactive table of the 5 cities' weather. Tapping a row is meant to
@@ -32,9 +33,19 @@ class WeatherDataTable extends StatelessWidget {
                 (city) => DataRow(
                   onSelectChanged: (_) => onCityTap(city),
                   cells: [
-                    DataCell(Text(city.cityName, style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ))),
+                    DataCell(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            city.cityName,
+                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 8),
+                          CountryBadge(countryCode: city.countryCode),
+                        ],
+                      ),
+                    ),
                     DataCell(
                       Image.network(
                         city.iconUrl,
@@ -43,7 +54,15 @@ class WeatherDataTable extends StatelessWidget {
                         errorBuilder: (_, _, _) => const Icon(Icons.cloud_outlined, size: 24),
                       ),
                     ),
-                    DataCell(Text('${city.temperature.round()}°C')),
+                    DataCell(
+                      Text(
+                        '${city.temperature.round()}°C',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
                     DataCell(Text(city.description)),
                     DataCell(Text('${city.humidity}%')),
                   ],

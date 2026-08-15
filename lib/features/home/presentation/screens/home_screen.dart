@@ -3,12 +3,18 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/theme/theme_controller.dart';
 import '../../../main/presentation/screens/main_screen.dart';
+import '../../../weather/data/repositories/weather_repository.dart';
 
 /// Welcome screen: greets the user and lets them start the weather
 /// experience. Navigation to [MainScreen] is a starting point — the final
 /// routing/back-stack behavior is owned by the navigation module.
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, WeatherRepository? mainScreenRepository})
+      : _mainScreenRepository = mainScreenRepository;
+
+  /// Injectable for tests; forwarded to the pushed [MainScreen]. Defaults to
+  /// null so [MainScreen] builds its own real, OpenWeather-backed repository.
+  final WeatherRepository? _mainScreenRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +68,9 @@ class HomeScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MainScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => MainScreen(repository: _mainScreenRepository),
+                      ),
                     ),
                     icon: const Icon(Icons.play_arrow_rounded),
                     label: const Text('Lancer l\'expérience'),
