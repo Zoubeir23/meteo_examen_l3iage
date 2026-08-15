@@ -28,7 +28,11 @@ enum _LoadState { loading, success, error }
 /// [WeatherRepository] are already decoupled from this wiring, so that
 /// change should stay local to this file.
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, WeatherRepository? repository}) : _repository = repository;
+
+  /// Injectable for tests; defaults to the real OpenWeather-backed
+  /// repository when omitted.
+  final WeatherRepository? _repository;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -41,10 +45,12 @@ class _MainScreenState extends State<MainScreen> {
     'Plus que quelques secondes avant le résultat…',
   ];
 
-  late final WeatherRepository _repository = WeatherRepository(
-    apiService: WeatherApiService(buildDioClient()),
-    apiKey: EnvConfig.openWeatherApiKey,
-  );
+  late final WeatherRepository _repository =
+      widget._repository ??
+      WeatherRepository(
+        apiService: WeatherApiService(buildDioClient()),
+        apiKey: EnvConfig.openWeatherApiKey,
+      );
 
   _LoadState _state = _LoadState.loading;
   double _progress = 0;
