@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meteo_examen_l3iage/core/constants/api_constants.dart';
 import 'package:meteo_examen_l3iage/core/theme/theme_controller.dart';
 import 'package:meteo_examen_l3iage/features/home/presentation/screens/home_screen.dart';
 import 'package:meteo_examen_l3iage/features/main/presentation/screens/main_screen.dart';
+import 'package:meteo_examen_l3iage/features/weather/data/models/open_weather_response.dart';
+import 'package:meteo_examen_l3iage/features/weather/data/repositories/weather_repository.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  setUpAll(() {
-    // MainScreen (pushed by the start button) reads EnvConfig.openWeatherApiKey,
-    // which needs dotenv to have been loaded at least once.
-    dotenv.testLoad(fileInput: 'OPENWEATHER_API_KEY=test-key');
-  });
+import '../../../weather/data/support/fake_weather_api_service.dart';
 
+void main() {
   testWidgets("tapping the start button navigates to MainScreen", (tester) async {
+    // Inject a fake repository so MainScreen's initial poll uses deterministic
+    // test data instead of issuing real OpenWeather HTTP requests.
+    final repository = WeatherRepository(
+      apiService: FakeWeatherApiService(
+        (cityQuery) async => OpenWeatherResponse.fromJson(buildOpenWeatherJson(cityQuery)),
+      ),
+      apiKey: 'test-key',
+    );
+
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => ThemeController(),
-        child: const MaterialApp(home: HomeScreen()),
+        child: MaterialApp(home: HomeScreen(mainScreenRepository: repository)),
       ),
     );
 
@@ -26,6 +33,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(MainScreen), findsOneWidget);
+
+    // Drain MainScreen's polling stream so no timers are left pending when
+    // the test ends (it starts polling for real as soon as it's pushed).
+    for (var i = 0; i < ApiConstants.pollCount; i++) {
+      await tester.pump(ApiConstants.pollingInterval);
+      await tester.pump();
+    }
   });
 
   testWidgets('tapping the theme icon toggles ThemeController to dark mode', (tester) async {
