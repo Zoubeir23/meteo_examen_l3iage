@@ -102,10 +102,18 @@ pour avancer en même temps que les vrais appels réseau.
 
 1. Copier `.env.example` vers `.env` à la racine du projet.
 2. Renseigner une clé API OpenWeather gratuite : https://openweathermap.org/api
-3. Pour Google Maps (page de détail), suivre la configuration par plateforme
-   du package [`google_maps_flutter`](https://pub.dev/packages/google_maps_flutter#platform-specific-configuration)
-   (clé API Android dans `android/app/src/main/AndroidManifest.xml`, clé iOS
-   dans `ios/Runner/AppDelegate.swift`).
+3. Pour Google Maps (page de détail), créer une clé avec **Maps SDK for
+   Android** et **Maps SDK for iOS** activés sur
+   https://console.cloud.google.com/google/maps-apis/credentials, puis :
+   - **Android** : ajouter la ligne `MAPS_API_KEY=ta_cle` dans
+     `android/local.properties` (fichier non commité, déjà présent après
+     `flutter pub get`) — elle est injectée automatiquement dans le manifest
+     par `android/app/build.gradle.kts`.
+   - **iOS** : copier `ios/Runner/ApiKeys.swift.example` vers
+     `ios/Runner/ApiKeys.swift` (non commité) et y coller la clé.
+
+   Sans clé, l'app se lance normalement mais la carte de la page de détail
+   reste grise.
 
 ## Tests
 

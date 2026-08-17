@@ -18,7 +18,18 @@ class CityDetailScreen extends StatelessWidget {
     final timeFormat = DateFormat.Hms();
 
     return Scaffold(
-      appBar: AppBar(title: Text(weather.cityName)),
+      appBar: AppBar(
+        title: Text(weather.cityName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home_rounded),
+            tooltip: "Retour à l'accueil",
+            // Revient directement à l'accueil même depuis cette page,
+            // sans repasser par l'écran principal.
+            onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),

@@ -16,17 +16,14 @@ import '../widgets/weather_progress_gauge.dart';
 
 enum _LoadState { loading, success, error }
 
-/// Main screen: fills the progress gauge in step with the real, repeated
-/// OpenWeather polling ([WeatherRepository.watchAllCitiesWeather]), then
-/// reveals the results table.
+/// Écran principal : anime la jauge de progression en cadence avec les
+/// vrais sondages OpenWeather ([WeatherRepository.watchAllCitiesWeather]),
+/// puis révèle le tableau des résultats.
 ///
-/// NOTE for the navigation/gauge owner: the gauge fill here is driven
-/// directly by poll progress (`pollIndex / ApiConstants.pollCount`) rather
-/// than a dedicated [AnimationController], and the loading messages rotate
-/// one per poll. Swap in a smoother `AnimationController`-driven
-/// interpolation between polls if desired — [WeatherProgressGauge] and
-/// [WeatherRepository] are already decoupled from this wiring, so that
-/// change should stay local to this file.
+/// La cible de progression (`pollIndex / ApiConstants.pollCount`) reste
+/// entièrement dérivée du flux réel — seul l'affichage entre deux sondages
+/// est interpolé en douceur via [_gaugeController], pas un minuteur
+/// indépendant.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, WeatherRepository? repository}) : _repository = repository;
 
@@ -38,12 +35,17 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   static const _loadingMessages = [
     'Nous téléchargeons les données…',
     "C'est presque fini…",
     'Plus que quelques secondes avant le résultat…',
   ];
+
+  /// Durée de l'interpolation visuelle entre deux sondages — largement
+  /// inférieure à [ApiConstants.pollingInterval] pour ne jamais prendre de
+  /// retard sur le prochain résultat réel.
+  static const _gaugeAnimationDuration = Duration(milliseconds: 800);
 
   late final WeatherRepository _repository =
       widget._repository ??
@@ -52,8 +54,13 @@ class _MainScreenState extends State<MainScreen> {
         apiKey: EnvConfig.openWeatherApiKey,
       );
 
+  late final AnimationController _gaugeController = AnimationController(
+    vsync: this,
+    duration: _gaugeAnimationDuration,
+  );
+  Animation<double> _gaugeAnimation = const AlwaysStoppedAnimation(0);
+
   _LoadState _state = _LoadState.loading;
-  double _progress = 0;
   int _messageIndex = 0;
   List<WeatherModel> _cities = const [];
   String _errorMessage = '';
@@ -69,16 +76,29 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void dispose() {
     _pollSubscription?.cancel();
+    _gaugeController.dispose();
     super.dispose();
+  }
+
+  /// Anime la jauge de sa position actuelle vers [target] (0.0-1.0). Partir
+  /// de la valeur courante (plutôt que de 0) évite tout saut si un nouveau
+  /// sondage arrive pendant qu'une interpolation précédente tourne encore.
+  void _animateGaugeTo(double target) {
+    setState(() {
+      _gaugeAnimation = Tween<double>(begin: _gaugeAnimation.value, end: target)
+          .animate(CurvedAnimation(parent: _gaugeController, curve: Curves.easeOutCubic));
+    });
+    _gaugeController.forward(from: 0);
   }
 
   void _startLoading() {
     _pollSubscription?.cancel();
+    _gaugeController.reset();
 
     setState(() {
       _state = _LoadState.loading;
-      _progress = 0;
       _messageIndex = 0;
+      _gaugeAnimation = const AlwaysStoppedAnimation(0);
     });
 
     var pollIndex = 0;
@@ -91,9 +111,9 @@ class _MainScreenState extends State<MainScreen> {
           case WeatherFetchSuccess(:final cities):
             setState(() {
               _cities = cities;
-              _progress = pollIndex / ApiConstants.pollCount;
               _messageIndex = (pollIndex - 1) % _loadingMessages.length;
             });
+            _animateGaugeTo(pollIndex / ApiConstants.pollCount);
           case WeatherFetchFailure(:final message):
             setState(() {
               _errorMessage = message;
@@ -103,10 +123,8 @@ class _MainScreenState extends State<MainScreen> {
       },
       onDone: () {
         if (!mounted || _state == _LoadState.error) return;
-        setState(() {
-          _progress = 1;
-          _state = _LoadState.success;
-        });
+        _animateGaugeTo(1);
+        setState(() => _state = _LoadState.success);
       },
     );
   }
@@ -117,10 +135,23 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  /// Revient directement à [HomeScreen], quelle que soit la profondeur de la
+  /// pile de navigation courante (utile depuis la page de détail).
+  void _goHome() => Navigator.of(context).popUntil((route) => route.isFirst);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Météo des 5 villes')),
+      appBar: AppBar(
+        title: const Text('Météo des 5 villes'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home_rounded),
+            tooltip: "Retour à l'accueil",
+            onPressed: _goHome,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -128,10 +159,13 @@ class _MainScreenState extends State<MainScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                child: WeatherProgressGauge(
-                  progress: _progress,
-                  loadingMessage: _loadingMessages[_messageIndex],
-                  onRestart: _state == _LoadState.success ? _startLoading : null,
+                child: AnimatedBuilder(
+                  animation: _gaugeAnimation,
+                  builder: (context, _) => WeatherProgressGauge(
+                    progress: _gaugeAnimation.value,
+                    loadingMessage: _loadingMessages[_messageIndex],
+                    onRestart: _state == _LoadState.success ? _startLoading : null,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
