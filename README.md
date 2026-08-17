@@ -130,4 +130,4 @@ sur `MainScreen` (chargement → tableau → détail, et cas d'erreur + retry).
 
 ## Deadline
 
-25 août 2026, 23h59 — aucun retard accepté.
+Mardi 25 août 2026, 23h59 — aucun retard accepté.
