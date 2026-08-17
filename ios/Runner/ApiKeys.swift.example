@@ -1,0 +1,8 @@
+// Copie ce fichier en `ApiKeys.swift` (même dossier) et renseigne ta clé.
+// `ApiKeys.swift` est gitignored : jamais commité.
+//
+// Clé Google Cloud avec "Maps SDK for iOS" activé :
+// https://console.cloud.google.com/google/maps-apis/credentials
+enum ApiKeys {
+    static let googleMaps = "YOUR_GOOGLE_MAPS_API_KEY"
+}
