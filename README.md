@@ -102,18 +102,24 @@ pour avancer en même temps que les vrais appels réseau.
 
 1. Copier `.env.example` vers `.env` à la racine du projet.
 2. Renseigner une clé API OpenWeather gratuite : https://openweathermap.org/api
-3. Pour Google Maps (page de détail), créer une clé avec **Maps SDK for
-   Android** et **Maps SDK for iOS** activés sur
-   https://console.cloud.google.com/google/maps-apis/credentials, puis :
-   - **Android** : ajouter la ligne `MAPS_API_KEY=ta_cle` dans
-     `android/local.properties` (fichier non commité, déjà présent après
-     `flutter pub get`) — elle est injectée automatiquement dans le manifest
-     par `android/app/build.gradle.kts`.
-   - **iOS** : copier `ios/Runner/ApiKeys.swift.example` vers
-     `ios/Runner/ApiKeys.swift` (non commité) et y coller la clé.
+3. Pour Google Maps (page de détail), créer **deux clés distinctes et
+   restreintes** sur https://console.cloud.google.com/google/maps-apis/credentials
+   (une clé unique non restreinte fonctionne aussi, mais expose inutilement
+   ton quota en cas de fuite) :
+   - **Android** : clé restreinte via *Application restrictions* → Android
+     apps (package `sn.isi.iage.meteo_examen_l3iage` + empreinte SHA-1 de
+     signature) et *API restrictions* → Maps SDK for Android. Ajouter la
+     ligne `MAPS_API_KEY=ta_cle` dans `android/local.properties` (fichier non
+     commité, déjà présent après `flutter pub get`) — elle est injectée
+     automatiquement dans le manifest par `android/app/build.gradle.kts`.
+   - **iOS** : clé restreinte via *Application restrictions* → iOS apps
+     (bundle ID `sn.isi.iage.meteoExamenL3iage`) et *API restrictions* →
+     Maps SDK for iOS. Copier `ios/Flutter/MapsKey.xcconfig.example` vers
+     `ios/Flutter/MapsKey.xcconfig` (non commité) et y coller la clé — elle
+     est lue via `Info.plist` (`GMSApiKey`) par `ios/Runner/ApiKeys.swift`.
 
-   Sans clé, l'app se lance normalement mais la carte de la page de détail
-   reste grise.
+   Sans clé, l'app se lance et compile normalement mais la carte de la page
+   de détail reste grise.
 
 ## Tests
 
@@ -130,4 +136,4 @@ sur `MainScreen` (chargement → tableau → détail, et cas d'erreur + retry).
 
 ## Deadline
 
-mardi 25 août 2026, 23h59 — aucun retard accepté.
+mardi 25 août 2026, 23 h 59 — aucun retard accepté.

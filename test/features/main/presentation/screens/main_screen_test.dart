@@ -6,6 +6,7 @@ import 'package:meteo_examen_l3iage/core/theme/theme_controller.dart';
 import 'package:meteo_examen_l3iage/features/detail/presentation/screens/city_detail_screen.dart';
 import 'package:meteo_examen_l3iage/features/home/presentation/screens/home_screen.dart';
 import 'package:meteo_examen_l3iage/features/main/presentation/screens/main_screen.dart';
+import 'package:meteo_examen_l3iage/features/main/presentation/widgets/weather_data_table.dart';
 import 'package:meteo_examen_l3iage/features/weather/data/models/open_weather_response.dart';
 import 'package:meteo_examen_l3iage/features/weather/data/repositories/weather_repository.dart';
 import 'package:provider/provider.dart';
@@ -47,6 +48,36 @@ void main() {
     expect(find.text('Paris'), findsOneWidget);
     expect(find.text('Recommencer'), findsOneWidget);
   });
+
+  testWidgets(
+    'keeps the results table hidden until the final gauge animation completes',
+    (tester) async {
+      final repository = WeatherRepository(
+        apiService: FakeWeatherApiService(
+          (cityQuery) async => OpenWeatherResponse.fromJson(
+            buildOpenWeatherJson(cityQuery.split(',').first),
+          ),
+        ),
+        apiKey: 'test-key',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: MainScreen(repository: repository)),
+      );
+
+      await tester.pump();
+      for (var i = 0; i < ApiConstants.pollCount - 1; i++) {
+        await tester.pump(ApiConstants.pollingInterval);
+        await tester.pump();
+      }
+      // Le dernier sondage vient d'arriver : la jauge anime encore vers
+      // 100 %, le tableau ne doit pas apparaître avant la fin.
+      expect(find.byType(WeatherDataTable), findsNothing);
+
+      await tester.pumpAndSettle();
+      expect(find.byType(WeatherDataTable), findsOneWidget);
+    },
+  );
 
   testWidgets('tapping a city row opens its detail screen', (tester) async {
     final repository = WeatherRepository(

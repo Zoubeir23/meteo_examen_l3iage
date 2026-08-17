@@ -83,12 +83,16 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   /// Anime la jauge de sa position actuelle vers [target] (0.0-1.0). Partir
   /// de la valeur courante (plutôt que de 0) évite tout saut si un nouveau
   /// sondage arrive pendant qu'une interpolation précédente tourne encore.
-  void _animateGaugeTo(double target) {
+  Future<void> _animateGaugeTo(double target) async {
     setState(() {
       _gaugeAnimation = Tween<double>(begin: _gaugeAnimation.value, end: target)
           .animate(CurvedAnimation(parent: _gaugeController, curve: Curves.easeOutCubic));
     });
-    _gaugeController.forward(from: 0);
+    try {
+      await _gaugeController.forward(from: 0).orCancel;
+    } on TickerCanceled {
+      // Écran démonté ou nouveau cycle relancé pendant l'animation — sans effet.
+    }
   }
 
   void _startLoading() {
@@ -121,9 +125,12 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             });
         }
       },
-      onDone: () {
+      onDone: () async {
         if (!mounted || _state == _LoadState.error) return;
-        _animateGaugeTo(1);
+        // Attend la fin de l'animation avant de révéler le tableau, pour que
+        // la jauge affiche bien 100 % au moment où les résultats apparaissent.
+        await _animateGaugeTo(1);
+        if (!mounted) return;
         setState(() => _state = _LoadState.success);
       },
     );

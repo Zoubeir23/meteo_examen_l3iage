@@ -8,9 +8,13 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // Clé lue depuis ApiKeys.swift (gitignored, voir ApiKeys.swift.example
-    // et le README) pour ne jamais committer de secret.
-    GMSServices.provideAPIKey(ApiKeys.googleMaps)
+    // Clé lue depuis Info.plist via ApiKeys.swift (voir MapsKey.xcconfig.example
+    // et le README) — jamais de secret en dur ici, et le projet compile même
+    // sans clé configurée localement (la carte reste alors grise).
+    let mapsApiKey = ApiKeys.googleMaps
+    if !mapsApiKey.isEmpty {
+      GMSServices.provideAPIKey(mapsApiKey)
+    }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

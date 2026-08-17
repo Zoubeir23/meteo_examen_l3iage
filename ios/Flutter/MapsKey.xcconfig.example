@@ -1,0 +1,6 @@
+// Copie ce fichier en "MapsKey.xcconfig" (même dossier) et renseigne ta clé.
+// "MapsKey.xcconfig" est gitignored : jamais commité.
+//
+// Clé Google Cloud restreinte au bundle ID iOS + "Maps SDK for iOS" activé :
+// https://console.cloud.google.com/google/maps-apis/credentials
+MAPS_API_KEY = YOUR_GOOGLE_MAPS_API_KEY
