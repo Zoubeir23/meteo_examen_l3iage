@@ -1,10 +1,10 @@
 # Météo en direct
 
-**Examen de Développement Mobile — L3 IAGE ISI 2026**
+**Examen de Développement Mobile L3 IAGE ISI 2026**
 
 Application Flutter qui récupère la météo en temps réel de 5 villes via l'API OpenWeather,
 affiche une jauge de progression animée synchronisée sur de vrais appels réseau répétés,
-puis présente les résultats dans un tableau interactif — avec, pour chaque ville, une page
+puis présente les résultats dans un tableau interactif avec, pour chaque ville, une page
 de détail incluant sa localisation exacte sur Google Maps.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.44+-02569B?logo=flutter&logoColor=white)
@@ -29,7 +29,7 @@ de détail incluant sa localisation exacte sur Google Maps.
   les quelques secondes (pas un minuteur décoratif) pour les 5 villes suivies
 - **Messages dynamiques** qui tournent en boucle pendant le chargement
 - **Tableau interactif** des 5 villes (icône, température, description, humidité, badge pays)
-- **Page de détail par ville** — infos météo complètes + localisation exacte sur Google Maps
+- **Page de détail par ville** infos météo complètes + localisation exacte sur Google Maps
 - **Gestion des erreurs API** avec message clair et bouton « Réessayer »
 - **Thème clair et sombre** soignés, palette de marque cohérente sur toute l'app
 - **Bouton « Recommencer »** une fois la jauge remplie, et retour à l'accueil à tout moment
@@ -110,12 +110,12 @@ pour avancer en même temps que les vrais appels réseau.
      apps (package `sn.isi.iage.meteo_examen_l3iage` + empreinte SHA-1 de
      signature) et *API restrictions* → Maps SDK for Android. Ajouter la
      ligne `MAPS_API_KEY=ta_cle` dans `android/local.properties` (fichier non
-     commité, déjà présent après `flutter pub get`) — elle est injectée
+     commité, déjà présent après `flutter pub get`) elle est injectée
      automatiquement dans le manifest par `android/app/build.gradle.kts`.
    - **iOS** : clé restreinte via *Application restrictions* → iOS apps
      (bundle ID `sn.isi.iage.meteoExamenL3iage`) et *API restrictions* →
      Maps SDK for iOS. Copier `ios/Flutter/MapsKey.xcconfig.example` vers
-     `ios/Flutter/MapsKey.xcconfig` (non commité) et y coller la clé — elle
+     `ios/Flutter/MapsKey.xcconfig` (non commité) et y coller la clé elle
      est lue via `Info.plist` (`GMSApiKey`) par `ios/Runner/ApiKeys.swift`.
 
    Sans clé, l'app se lance et compile normalement mais la carte de la page
@@ -129,11 +129,11 @@ flutter test
 flutter test --coverage   # génère coverage/lcov.info
 ```
 
-40 tests — unit tests (modèles, repository, polling), widget tests (tableau,
+40 tests unit tests (modèles, repository, polling), widget tests (tableau,
 jauge, écrans d'accueil/détail/erreur) et un test d'intégration de bout en bout
 sur `MainScreen` (chargement → tableau → détail, et cas d'erreur + retry).
 ≈91 % de couverture de lignes sur le code applicatif.
 
 ## Deadline
 
-mardi 25 août 2026, 23 h 59 — aucun retard accepté.
+mardi 25 août 2026, 23 h 59 aucun retard accepté.
